@@ -1,4 +1,5 @@
 # Simon Hugot
+import pandas as pd
 from pandas import *
 import yfinance as yf
 import numpy as np
@@ -7,8 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn import metrics
 
-doc = read_csv('/content/drive/MyDrive/Class/BSPs/BSP06/Abnormal_results/Dax/rating_dax.csv')
-doc = doc.iloc[:, 1:]
+doc = read_csv('rating_dax.csv')
 r, c = doc.shape
 changesList = []
 final_list = []
@@ -76,6 +76,10 @@ for tupl in variation_list:
 for i in list(dict.fromkeys(final_list)):
     print(i)
 '''
+
+list_alpha = []
+list_beta = []
+
 # daily index of the company and the
 for tuples in final_list:
     # Company growth index
@@ -120,41 +124,50 @@ for tuples in final_list:
     prices_data.drop(index=prices_data.index[:diff_sizes], axis=0, inplace=True)
     prices_data.insert(2, 'Daily Market return', daily_market_returns)
     prices_data = prices_data.drop(['Close'], axis=1)
-
     # print(prices_data)
 
-# Linear regression between market index and company index for a range of years
-'''
-prices_data.plot(x='Daily return', y='Daily Market return', style='o')
-plt.title('Market growth vs Company growth')
-plt.xlabel('Company growth')
-plt.ylabel('Market growth')
-plt.show()
-'''
-X = prices_data.iloc[:, :-1].values
-y = prices_data.iloc[:, 1].values
+    # Linear regression between market index and company index for a range of years
+    '''
+    prices_data.plot(x='Daily return', y='Daily Market return', style='o')
+    plt.title('Market growth vs Company growth')
+    plt.xlabel('Company growth')
+    plt.ylabel('Market growth')
+    plt.show()
+    '''
+    X = prices_data.iloc[:, :-1].values
+    y = prices_data.iloc[:, 1].values
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-regressor = LinearRegression()
-regressor.fit(X_train, y_train)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+    regressor = LinearRegression()
+    regressor.fit(X_train, y_train)
 
-# prediction
-y_pred = regressor.predict(X_test)
-df_prediction = DataFrame({'Actual': y_test, 'Predicted': y_pred})
+    print(len(X_test))
+    # prediction
+    y_pred = regressor.predict(X_test)
+    df_prediction = DataFrame({'Actual': y_test, 'Predicted': y_pred})
 
-alpha = regressor.intercept_
-beta = regressor.coef_[0]
-print(alpha, beta)
+    alpha = regressor.intercept_
+    beta = regressor.coef_[0]
+    print(alpha, beta)
 
-fig, ax = plt.subplots()
-ax.set_title("Intercept: " + str(round(alpha, 5)) + ", Coefficient: " + str(round(beta, 3)))
-ax.scatter(X, y)
-ax.plot(X, y_pred, c='r')
+    list_alpha.append(alpha)
+    list_beta.append(beta)
 
-# Evaluate the model
-print("Evaluation Metrics")
-print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
-print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
-print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+    size_diff = len(X) - len(y_pred)
+    padding_list = []
+    for i in range(size_diff):
+        padding_list.append(None)
+    y_pred = padding_list * y_pred
 
-# 1
+    fig, ax = plt.subplots()
+    ax.set_title("Intercept: " + str(round(alpha, 5)) + ", Coefficient: " + str(round(beta, 3)))
+    ax.scatter(X, y)
+    ax.plot(X, y_pred, color='red')
+
+
+    # Evaluate the model
+    print("Evaluation Metrics")
+    print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
+    print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
+    print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+    # 1
