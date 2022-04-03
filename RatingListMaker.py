@@ -1,12 +1,10 @@
 # Simon Hugot
-import pandas as pd
 from pandas import *
 import yfinance as yf
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
-from sklearn import metrics
 
 doc = read_csv('rating_dax.csv')
 r, c = doc.shape
@@ -81,6 +79,7 @@ list_alpha = []
 list_beta = []
 
 # daily index of the company and the
+print(final_list)
 for tuples in final_list:
     # Company growth index
     name = tuples[0]
@@ -120,10 +119,18 @@ for tuples in final_list:
         daily_market_returns.append(temp_daily_return)
         yearly_market_return += temp_daily_return
 
+    print(len(daily_market_returns))
+    print(prices_data.shape[0])
     diff_sizes = prices_data.shape[0] - len(daily_market_returns)
-    prices_data.drop(index=prices_data.index[:diff_sizes], axis=0, inplace=True)
-    prices_data.insert(2, 'Daily Market return', daily_market_returns)
-    prices_data = prices_data.drop(['Close'], axis=1)
+    if diff_sizes > 0:
+        prices_data.drop(index=prices_data.index[:diff_sizes], axis=0, inplace=True)
+        prices_data.insert(2, 'Daily Market return', daily_market_returns)
+        prices_data = prices_data.drop(['Close'], axis=1)
+    else:
+        daily_market_returns = daily_market_returns[: diff_sizes]
+        prices_data.insert(2, 'Daily Market return', daily_market_returns)
+        prices_data = prices_data.drop(['Close'], axis=1)
+
     # print(prices_data)
 
     # Linear regression between market index and company index for a range of years
@@ -141,14 +148,12 @@ for tuples in final_list:
     regressor = LinearRegression()
     regressor.fit(X_train, y_train)
 
-    print(len(X_test))
     # prediction
     y_pred = regressor.predict(X_test)
     df_prediction = DataFrame({'Actual': y_test, 'Predicted': y_pred})
 
     alpha = regressor.intercept_
     beta = regressor.coef_[0]
-    print(alpha, beta)
 
     list_alpha.append(alpha)
     list_beta.append(beta)
@@ -157,17 +162,13 @@ for tuples in final_list:
     padding_list = []
     for i in range(size_diff):
         padding_list.append(None)
-    y_pred = padding_list * y_pred
+    y_pred = np.append(y_pred, np.asarray(padding_list))
 
-    fig, ax = plt.subplots()
-    ax.set_title("Intercept: " + str(round(alpha, 5)) + ", Coefficient: " + str(round(beta, 3)))
-    ax.scatter(X, y)
-    ax.plot(X, y_pred, color='red')
+    plt.scatter(X, y_pred)
+    plt.show()
+    # include name of the stock in the plot as well as the alpaha and beta values for clarity.
 
-
-    # Evaluate the model
-    print("Evaluation Metrics")
-    print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
-    print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
-    print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
-    # 1
+print("Alpha values: ", list_alpha, "\n Beta values: ", list_beta)
+#TODO find a way to vizualise the alpha and beta values instead of simple list.
+#TODO create df with stock name, year, alpha, beta
+#TODO add to the previous df (final-list)
