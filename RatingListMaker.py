@@ -1,10 +1,13 @@
 # Simon Hugot
+import pandas as pd
 from pandas import *
 import yfinance as yf
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
+import seaborn as sns
+from iteration_utilities import flatten
 
 doc = read_csv('rating_dax.csv')
 r, c = doc.shape
@@ -119,8 +122,6 @@ for tuples in final_list:
         daily_market_returns.append(temp_daily_return)
         yearly_market_return += temp_daily_return
 
-    print(len(daily_market_returns))
-    print(prices_data.shape[0])
     diff_sizes = prices_data.shape[0] - len(daily_market_returns)
     if diff_sizes > 0:
         prices_data.drop(index=prices_data.index[:diff_sizes], axis=0, inplace=True)
@@ -164,11 +165,20 @@ for tuples in final_list:
         padding_list.append(None)
     y_pred = np.append(y_pred, np.asarray(padding_list))
 
-    plt.scatter(X, y_pred)
+    XYdf = pd.DataFrame()
+    XYdf.insert(0, 'X', value=list(flatten(X)))
+    XYdf.insert(1, 'Y', value=y_pred)
+
+    sns.regplot(x='X', y='Y', data=XYdf)
+    plt.title('Y_pred against X values')
     plt.show()
-    # include name of the stock in the plot as well as the alpaha and beta values for clarity.
+
+ABdf = pd.DataFrame()
+ABdf.insert(0, 'Alpha', value=list_alpha)
+ABdf.insert(1, 'Beta', value=list_beta)
+
+sns.regplot(x="Alpha", y="Beta", data=ABdf)
+plt.title('Alpha against Beta values')
+plt.show()
 
 print("Alpha values: ", list_alpha, "\n Beta values: ", list_beta)
-#TODO find a way to vizualise the alpha and beta values instead of simple list.
-#TODO create df with stock name, year, alpha, beta
-#TODO add to the previous df (final-list)
