@@ -169,9 +169,11 @@ for tuples in final_list:
     XYdf.insert(0, 'X', value=list(flatten(X)))
     XYdf.insert(1, 'Y', value=y_pred)
 
+    '''
     sns.regplot(x='X', y='Y', data=XYdf)
     plt.title('Y_pred against X values')
     plt.show()
+    '''
 
 ABdf = pd.DataFrame()
 ABdf.insert(0, 'Alpha', value=list_alpha)

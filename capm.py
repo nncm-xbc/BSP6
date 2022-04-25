@@ -1,8 +1,11 @@
+import datetime
+import yfinance as yf
+import pandas as pd
+import statsmodels.api as sm
+"""
 import numpy as np
 import pandas_datareader as pdr
 import datetime as dt
-import pandas as pd
-import statsmodels.api as sm
 
 #-----------------implementation 1 of CAPM -----------------
 
@@ -24,40 +27,48 @@ beta = cov.loc['AAPL', '^GSPC'] / var
 risk_free_return = 0.0138
 market_return = .105
 expected_return = risk_free_return + beta * (market_return - risk_free_return)
+"""
 
 #-----------------implementation 2 of CAPM -----------------
-'''
-Download monthly prices of Facebook and S&P 500 index from 2014 to 2017
-CSV file downloaded from Yahoo File
-start period: 02/11/2014 
-end period: 30/11/2014
-period format: DD/MM/YEAR
-'''
-fb = pd.read_csv('FB.csv', parse_dates=True, index_col='Date',)
-sp_500 = pd.read_csv('^GSPC.csv', parse_dates=True, index_col='Date')
 
-# joining the closing prices of the two datasets
-monthly_prices = pd.concat([fb['Close'], sp_500['Close']], axis=1)
-monthly_prices.columns = ['FB', '^GSPC']
+def capm(year, stock, market):
+    #download daily prices of stock and market into csv
+    min_year = year-1
+    max_year = year+1
+    start = datetime.datetime(min_year, 1, 1)
+    end = datetime.datetime(max_year, 1, 1)
 
-# check the head of the dataframe
-print(monthly_prices.head())
+    mk = yf.download(market, start=start, end=end, interval="1d")
+    st = yf.download(stock, start=start, end=end, interval="1d")
 
-# calculate monthly returns
-monthly_returns = monthly_prices.pct_change(1)
-clean_monthly_returns = monthly_returns.dropna(axis=0)  # drop first missing row
-print(clean_monthly_returns.head())
+    # joining the closing prices of the two datasets
+    # st = stock; mk = market
+    daily_prices = pd.concat([st['Close'], mk['Close']], axis=1)
+    daily_prices.columns = [stock, market]
 
-# split dependent and independent variable
-X = clean_monthly_returns['^GSPC']
-y = clean_monthly_returns['FB']
+    # check the head of the dataframe
+    print(daily_prices.head())
 
-# Add a constant to the independent value
-X1 = sm.add_constant(X)
+    # calculate daily returns
+    daily_returns = daily_prices.pct_change(1)
+    clean_daily_returns = daily_returns.dropna(axis=0)  # drop first missing row
+    print(clean_daily_returns.head())
 
-# make regression model
-model = sm.OLS(y, X1)
+    # split dependent and independent variable
+    X = clean_daily_returns[market]
+    y = clean_daily_returns[stock]
 
-# fit model and print results
-results = model.fit()
-print(results.summary())
+    # Add a constant to the independent value
+    X1 = sm.add_constant(X)
+
+    # make regression model
+    model = sm.OLS(y, X1)
+
+    # fit model and print results
+    results = model.fit()
+    print(results.summary())
+
+st_name = "ADS.DE"
+mk_name = "dax"
+ch_year = 2021
+capm(stock=st_name, market=mk_name, year=ch_year)
