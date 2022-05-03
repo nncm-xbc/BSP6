@@ -26,8 +26,6 @@ def detect_event(raw_data, market):
 
     doc = read_csv(raw_data)
     r, c = doc.shape
-    changesList = []
-    final_list = []
 
     # first S&P second Moody's
     rating_scales = [["AAA", "AA+", "AA", "AA-", "A+", "A", "A-", "BBB+", "BBB", "BBB-", "BB+", "BB", "BB-", "B+", "B", "B-", "CCC+", "CCC", "CCC-", "CC", "C", "D"],
@@ -58,7 +56,7 @@ def detect_event(raw_data, market):
                 if i != "***":
                     temp_index = ratings_list.index(i)
                     variation_list.append((doc.iloc[r - 1, col], dates_list[temp_index], i))
-        # print(variation_list)
+
         final_list = []
 
         for tupl in variation_list:
@@ -99,9 +97,8 @@ def detect_event(raw_data, market):
         df.insert(0, "Rating Agency", names_agencies[index_agency])
         df.insert(0, "Market", market)
         df.drop_duplicates(subset=None, keep="first", inplace=True)
-        print(df)
 
-        # save the dataframe as a csv in the folder of its corresponding
+        # save the dataframe as a csv in the correct folder
         filepath = Path('Data/'+market+'/StockChanges-'+market+'-'+names_agencies[index_agency]+'.csv')
         df.to_csv(filepath)
 
@@ -117,60 +114,65 @@ def daily_returns(filepath):
     """
     doc = read_csv(filepath)
 
-    for row in doc:
+    for index, row in doc.iterrows():
         # Company growth index
-        name = doc.loc[row]['Stock']
-        date = doc.loc[row]['Date']
+        name = row['Stock']
+        date = row['Date']
 
         # compute the three 1 year periods
         dtObj = datetime.strptime(date, '%Y-%m-%d')
 
-        start_date = dtObj - relativedelta(months=6)
-        end_date = dtObj + relativedelta(months=6)
-        yearly_company_return = 0
-        daily_returns = []
+        start_dates = [ dtObj - relativedelta(years=1), dtObj - relativedelta(months=6), dtObj]
+        end_dates = [dtObj, dtObj + relativedelta(months=6), dtObj + relativedelta(years=1)]
 
-        prices_data = yf.download(name, start=start_date, end=end_date, interval="1d")
-        prices_data = prices_data.drop(['High', 'Low', 'Adj Close', 'Volume', 'Open'], axis=1)
+        for iter in range(len(start_dates)):
+            yearly_company_return = 0
+            daily_returns = []
 
-        r, c = prices_data.shape
-        for row in range(r):
-            prev_daily_return = prices_data.iloc[row - 1, 0]
-            if prev_daily_return != 0:
-                temp_daily_return = ((prices_data.iloc[row, 0] - prev_daily_return) / prev_daily_return) * 100
+            prices_data = yf.download(name, start=start_dates[iter], end=end_dates[iter], interval="1d")
+            prices_data = prices_data.drop(['High', 'Low', 'Adj Close', 'Volume', 'Open'], axis=1)
+
+            r, c = prices_data.shape
+            for row in range(r):
+                prev_daily_return = prices_data.iloc[row - 1, 0]
+                if prev_daily_return != 0:
+                    temp_daily_return = ((prices_data.iloc[row, 0] - prev_daily_return) / prev_daily_return) * 100
+                else:
+                    temp_daily_return = 0
+                daily_returns.append(temp_daily_return)
+                yearly_company_return += temp_daily_return
+
+            prices_data.insert(1, 'Daily return', daily_returns)
+
+            # Market growth index
+            market_data = yf.download('dax', start=start_dates[iter], end=end_dates[iter], interval="1d")
+            market_data = market_data.drop(['High', 'Low', 'Adj Close', 'Volume', 'Open'], axis=1)
+            yearly_market_return = 0
+            daily_market_returns = []
+
+            r, c = market_data.shape
+            for row in range(r):
+                prev_daily_market_return = market_data.iloc[row - 1, 0]
+                if prev_daily_market_return != 0:
+                    temp_daily_return = ((market_data.iloc[row, 0] - prev_daily_market_return) / prev_daily_market_return) * 100
+                else:
+                    temp_daily_return = 0
+                daily_market_returns.append(temp_daily_return)
+                yearly_market_return += temp_daily_return
+
+            diff_sizes = prices_data.shape[0] - len(daily_market_returns)
+            if diff_sizes > 0:
+                prices_data.drop(index=prices_data.index[:diff_sizes], axis=0, inplace=True)
+                prices_data.insert(2, 'Daily Market return', daily_market_returns)
+                prices_data = prices_data.drop(['Close'], axis=1)
             else:
-                temp_daily_return = 0
-            daily_returns.append(temp_daily_return)
-            yearly_company_return += temp_daily_return
+                daily_market_returns = daily_market_returns[: diff_sizes]
+                prices_data.insert(2, 'Daily Market return', daily_market_returns)
+                prices_data = prices_data.drop(['Close'], axis=1)
 
-        prices_data.insert(1, 'Daily return', daily_returns)
-
-        # Market growth index
-        market_data = yf.download('dax', start=start_date, end=end_date, interval="1d")
-        market_data = market_data.drop(['High', 'Low', 'Adj Close', 'Volume', 'Open'], axis=1)
-        yearly_market_return = 0
-        daily_market_returns = []
-
-        r, c = market_data.shape
-        for row in range(r):
-            prev_daily_market_return = market_data.iloc[row - 1, 0]
-            if prev_daily_market_return != 0:
-                temp_daily_return = ((market_data.iloc[row, 0] - prev_daily_market_return) / prev_daily_market_return) * 100
-            else:
-                temp_daily_return = 0
-            daily_market_returns.append(temp_daily_return)
-            yearly_market_return += temp_daily_return
-
-        diff_sizes = prices_data.shape[0] - len(daily_market_returns)
-        if diff_sizes > 0:
-            prices_data.drop(index=prices_data.index[:diff_sizes], axis=0, inplace=True)
-            prices_data.insert(2, 'Daily Market return', daily_market_returns)
-            prices_data = prices_data.drop(['Close'], axis=1)
-        else:
-            daily_market_returns = daily_market_returns[: diff_sizes]
-            prices_data.insert(2, 'Daily Market return', daily_market_returns)
-            prices_data = prices_data.drop(['Close'], axis=1)
-        print(prices_data)
+            # save the dataframe as a csv in the correct folder
+            filepath = Path('Data/' + row['Market'] + '/Prices/' + row['Market'] + '-' + row['Stock'] + '-' + row['Rating Agency'] + '-' + start_dates[iter] + '-' + end_dates[iter] + '.csv')
+            prices_data.to_csv(filepath)
 
 
 # Function 3 that computes the CAPM of a given Stock and market in a time range.
