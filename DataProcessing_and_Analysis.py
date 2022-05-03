@@ -8,6 +8,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 import seaborn as sns
 from iteration_utilities import flatten
+from pathlib import Path
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 
 def detect_event(raw_data, market):
@@ -15,7 +18,7 @@ def detect_event(raw_data, market):
     Function that takes as input a raw csv file containing the event-log of security ratings
     for both the S&P and Moody's rating agencies.
     This function can only handle S&P and Moody's ratings as the grading scales are hardcoded.
-    :param raw_data: csv file containing the event-log of the security ratings for S&P and Moody's on a specified market
+    :param raw_data: name of the csv file containing the event-log of the security ratings for S&P and Moody's on a specified market
     :param market: name of the market for which the security ratings are defined.
     :return: returns a csv that only contains the stocks for which the security ratings has been updated.
     The date of the change is specified, as well as whether it has been upgraded of downgraded.
@@ -26,15 +29,15 @@ def detect_event(raw_data, market):
     changesList = []
     final_list = []
 
-    rating_SP = ["AAA", "AA+", "AA", "AA-", "A+", "A", "A-", "BBB+", "BBB", "BBB-", "BB+", "BB", "BB-", "B+", "B", "B-", "CCC+", "CCC", "CCC-", "CC", "C", "D"]
-    rating_moodys = ["Aaa", "Aa1", "Aa2", "Aa3", "A1", "A2", "A3", "Baa1", "Baa2", "Baa3", "Ba1", "Ba2", "Ba3", "B1", "B2", "B3", "Caa1", "Caa2", "Caa3", "Caa"]
+    # first S&P second Moody's
+    rating_scales = [["AAA", "AA+", "AA", "AA-", "A+", "A", "A-", "BBB+", "BBB", "BBB-", "BB+", "BB", "BB-", "B+", "B", "B-", "CCC+", "CCC", "CCC-", "CC", "C", "D"],
+                     ["Aaa", "Aa1", "Aa2", "Aa3", "A1", "A2", "A3", "Baa1", "Baa2", "Baa3", "Ba1", "Ba2", "Ba3", "B1", "B2", "B3", "Caa1", "Caa2", "Caa3", "Caa"]]
 
-    names_agencies = {"S&P", "Moody's"}
-    names_dates = {"DateS", "DateM"}
+    names_agencies = ["S&P", "Moody's"]
+    names_dates = ["DateS", "DateM"]
 
     # perform the actions for both security agencies
     for index_agency in range(len(names_agencies)):
-        # example process for S&P
         variation_list = []
         for col in range(1, c):
             ratings_list = []
@@ -66,16 +69,16 @@ def detect_event(raw_data, market):
                     if ' / ' in tupl[2] or ' / ' in tups[2]:
                         st1 = tupl[2].split(' / ')[0]
                         st2 = tups[2].split(' / ')[0]
-                        val_recent = rating_SP.index(st1)
-                        val_old = rating_SP.index(st2)
+                        val_recent = rating_scales[index_agency].index(st1)
+                        val_old = rating_scales[index_agency].index(st2)
                     elif ' - ' in tupl[2] or ' - ' in tups[2]:
                         st1 = tupl[2].split(' - ')[0]
                         st2 = tups[2].split(' - ')[0]
-                        val_recent = rating_SP.index(st1)
-                        val_old = rating_SP.index(st2)
+                        val_recent = rating_scales[index_agency].index(st1)
+                        val_old = rating_scales[index_agency].index(st2)
                     else:
-                        val_recent = rating_SP.index(tupl[2])
-                        val_old = rating_SP.index(tups[2])
+                        val_recent = rating_scales[index_agency].index(tupl[2])
+                        val_old = rating_scales[index_agency].index(tups[2])
 
                     # check indexes and attribute the correct change to the corresponding difference
                     if val_recent < val_old:
@@ -90,37 +93,40 @@ def detect_event(raw_data, market):
                     final_list.append((tupl[0], tupl[1], "N/A"))
                 else:
                     continue
-        '''
-        for i in list(dict.fromkeys(final_list)):
-            print(i)
-        '''
+
         # create corresponding dataframe and save it as csv file in the folde corresponding to the correct market.
         df = pd.DataFrame(final_list, columns=["Stock", "Date", "Variation"])
         df.insert(0, "Rating Agency", names_agencies[index_agency])
         df.insert(0, "Market", market)
+        df.drop_duplicates(subset=None, keep="first", inplace=True)
+        print(df)
 
-        # save the dataframe as a csv in the folder of its corresponding 
-        df.to_csv(f'Data/{market}/StockChanges-{market}-{names_agencies[index_agency]}.csv', index=False)
+        # save the dataframe as a csv in the folder of its corresponding
+        filepath = Path('Data/'+market+'/StockChanges-'+market+'-'+names_agencies[index_agency]+'.csv')
+        df.to_csv(filepath)
 
 
-        # daily index of the company and the market
-        print(final_list)
-
-def daily_returns(change_log):
+def daily_returns(filepath):
     """
     Function that given a csv file containing stocks of a market and a date, computes the daily returns of both the stock
     and the market for a period of 1 year. This operation is computed for 3 different period: The first one is the year
     before the given date. The second period is the year containing the given date as its middle. The third period is
     the year after the given date.
-    :param change_log: file containing the market name, stocks and their corresponding dates.
+    :param filepath: path of the file containing the market name, stocks and their corresponding dates.
     :return: returns a collection of csv files that containg the daily prices of a stock on a market for a period of 1 year
     """
+    doc = read_csv(filepath)
 
-    for tuples in final_list:
+    for row in doc:
         # Company growth index
-        name = tuples[0]
-        start_date = tuples[1].split("-")[0] + "-01-01"
-        end_date = tuples[1].split("-")[0] + "-12-31"
+        name = doc.loc[row]['Stock']
+        date = doc.loc[row]['Date']
+
+        # compute the three 1 year periods
+        dtObj = datetime.strptime(date, '%Y-%m-%d')
+
+        start_date = dtObj - relativedelta(months=6)
+        end_date = dtObj + relativedelta(months=6)
         yearly_company_return = 0
         daily_returns = []
 
@@ -164,12 +170,12 @@ def daily_returns(change_log):
             daily_market_returns = daily_market_returns[: diff_sizes]
             prices_data.insert(2, 'Daily Market return', daily_market_returns)
             prices_data = prices_data.drop(['Close'], axis=1)
-        # print(prices_data)
+        print(prices_data)
 
-    # Function 3 that computes the CAPM of a given Stock and market in a time range.
-    # return as CSV with Market, Stock, Alpha, Beta
-    # Linear regression between market index and company index for a range of years
 
+# Function 3 that computes the CAPM of a given Stock and market in a time range.
+# return as CSV with Market, Stock, Alpha, Beta
+# Linear regression between market index and company index for a range of years
 def capm():
     list_alpha = []
     list_beta = []
@@ -224,4 +230,10 @@ def capm():
 
     print("Alpha values: ", list_alpha, "\n Beta values: ", list_beta)
 
-def abnormal_results():
+
+# Main
+# get list of stock for which changes were made in their security ratings
+# detect_event('rating_dax.csv', 'DAX')
+
+# download the daily prices for the market and the stocks of the previous list.
+daily_returns("Data/DAX/StockChanges-DAX-Moody's.csv")
