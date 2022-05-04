@@ -1,4 +1,6 @@
 # Simon Hugot
+import os
+
 import pandas as pd
 from pandas import *
 import yfinance as yf
@@ -162,7 +164,9 @@ def daily_return_index(filepath):
             # save the dataframe as a csv in the correct folder
             start_datestr = start_dates[iter].strftime('%Y-%m-%d')
             end_datestr = end_dates[iter].strftime('%Y-%m-%d')
-            filepath = Path('Data/' + market_name + '/Prices/' + stock_name + '-' + agency_name + '-' + start_datestr + '-' + end_datestr + '.csv')
+            temp_path = 'Data/' + market_name + '/Prices/' + end_datestr[0]
+            os.makedirs(temp_path)
+            filepath = Path(temp_path + '/' + stock_name + market_name + start_datestr + '-' + end_datestr + '.csv')
             final_indexes.to_csv(filepath)
 
 
@@ -170,6 +174,11 @@ def daily_return_index(filepath):
 # return as CSV with Market, Stock, Alpha, Beta
 # Linear regression between market index and company index for a range of years
 def capm(filepath):
+    """
+    Function that computes the alpha and beta values for a stock in a given market over the course of a year.
+    :param filepath: path to the file that contains the stock and market prices.
+    :return: returns the alpha and beta values in a csv file
+    """
     doc = read_csv(filepath)
 
     list_alpha = []
@@ -218,12 +227,18 @@ def capm(filepath):
 
     print("Alpha values: ", list_alpha, "\n Beta values: ", list_beta)
 
+
 def CAAR(filepath):
-    # sum-from1toN(stock_return - stock_beta * market_return - alpha)/N
+    # sum-from1toN(stock_return - beta * market_return - alpha)/N
     # whats N ?
 
-    stock_return
-    market_return
+    stock_return = 0
+    market_return = 0
+    beta = 0
+    alpha = 0
+    N = 0
+    for i in range(1, N+1):
+        abv = (stock_return - beta * market_return - alpha)/N
 
 
 # Main
@@ -231,7 +246,7 @@ def CAAR(filepath):
 # detect_event('rating_dax.csv', 'DAX')
 
 # download the daily prices for the market and the stocks of the previous list.
-# daily_return_index("Data/DAX/StockChanges-DAX-Moody's.csv")
+daily_return_index("Data/DAX/StockChanges-DAX-Moody's.csv")
 
 # compute the CAPM and extract alpha and beta values
 # example with one file
