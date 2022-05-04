@@ -169,19 +169,14 @@ def daily_return_index(filepath):
 # Function 3 that computes the CAPM of a given Stock and market in a time range.
 # return as CSV with Market, Stock, Alpha, Beta
 # Linear regression between market index and company index for a range of years
-def capm():
+def capm(filepath):
+    doc = read_csv(filepath)
+
     list_alpha = []
     list_beta = []
 
-    '''
-    prices_data.plot(x='Daily return', y='Daily Market return', style='o')
-    plt.title('Market growth vs Company growth')
-    plt.xlabel('Company growth')
-    plt.ylabel('Market growth')
-    plt.show()
-    '''
-    X = prices_data.iloc[:, :-1].values
-    y = prices_data.iloc[:, 1].values
+    X = doc['Stock return'].values
+    y = doc['Market return'].values
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
     regressor = LinearRegression()
@@ -223,10 +218,21 @@ def capm():
 
     print("Alpha values: ", list_alpha, "\n Beta values: ", list_beta)
 
+def CAAR(filepath):
+    # sum-from1toN(stock_return - stock_beta * market_return - alpha)/N
+    # whats N ?
+
+    stock_return
+    market_return
+
 
 # Main
 # get list of stock for which changes were made in their security ratings
 # detect_event('rating_dax.csv', 'DAX')
 
 # download the daily prices for the market and the stocks of the previous list.
-daily_return_index("Data/DAX/StockChanges-DAX-Moody's.csv")
+# daily_return_index("Data/DAX/StockChanges-DAX-Moody's.csv")
+
+# compute the CAPM and extract alpha and beta values
+# example with one file
+capm("Data/DAX/Prices/1COV.DE-Moody's-2018-07-30/1COV.DE-Moody's-2017-07-30-2018-07-30.csv")
