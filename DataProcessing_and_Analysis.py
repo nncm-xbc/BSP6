@@ -164,10 +164,14 @@ def daily_return_index(filepath):
             # save the dataframe as a csv in the correct folder
             start_datestr = start_dates[iter].strftime('%Y-%m-%d')
             end_datestr = end_dates[iter].strftime('%Y-%m-%d')
-            temp_path = 'Data/' + market_name + '/Prices/' + end_datestr[0]
-            os.makedirs(temp_path)
-            filepath = Path(temp_path + '/' + stock_name + market_name + start_datestr + '-' + end_datestr + '.csv')
-            final_indexes.to_csv(filepath)
+            temp_path = 'Data/' + market_name + '/Prices/' + stock_name + '-' + agency_name + '-' + end_datestr[0]
+            if os.path.isdir(str(stock_name + agency_name + end_datestr[0])):
+                filepath = Path(temp_path + '/' + stock_name + '-' + agency_name + '-' + start_datestr + '-' + end_datestr + '.csv')
+                final_indexes.to_csv(filepath)
+            else:
+                os.makedirs(temp_path)
+                filepath = Path(temp_path + '/' + stock_name + '-' + agency_name + '-' + start_datestr + '-' + end_datestr + '.csv')
+                final_indexes.to_csv(filepath)
 
 
 # Function 3 that computes the CAPM of a given Stock and market in a time range.
@@ -250,4 +254,4 @@ daily_return_index("Data/DAX/StockChanges-DAX-Moody's.csv")
 
 # compute the CAPM and extract alpha and beta values
 # example with one file
-capm("Data/DAX/Prices/1COV.DE-Moody's-2018-07-30/1COV.DE-Moody's-2017-07-30-2018-07-30.csv")
+capm("Data/DAX/Prices/1COV.DE-Moody's-2018-07-30-Test/1COV.DE-Moody's-2017-07-30-2018-07-30.csv")
