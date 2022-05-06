@@ -2,6 +2,8 @@ import datetime
 import yfinance as yf
 import pandas as pd
 import statsmodels.api as sm
+from scipy import stats
+
 """
 import numpy as np
 import pandas_datareader as pdr
@@ -66,6 +68,11 @@ def capm(year, stock, market):
 
     # fit model and print results
     results = model.fit()
+
+    slope, intercept, r_value, p_value, std_err = stats.linregress(X, y)
+
+    print(slope, intercept)
+
     print(results.summary())
 
 st_name = "ADS.DE"

@@ -1,18 +1,15 @@
 # Simon Hugot
 import os
-
 import pandas as pd
 from pandas import *
 import yfinance as yf
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-import seaborn as sns
-from iteration_utilities import flatten
 from pathlib import Path
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from scipy import stats
+import statsmodels.api as sm
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def detect_event(raw_data, market):
@@ -176,63 +173,43 @@ def daily_return_index(filepath):
                 final_indexes.to_csv(filepath)
 
 
-# Function 3 that computes the CAPM of a given Stock and market in a time range.
-# return as CSV with Market, Stock, Alpha, Beta
-# Linear regression between market index and company index for a range of years
 def capm(filepath):
     """
     Function that computes the alpha and beta values for a stock in a given market over the course of a year.
     :param filepath: path to the file that contains the stock and market prices.
     :return: returns the alpha and beta values in a csv file
     """
-    doc = read_csv(filepath)
+    alpha_values = []
+    beta_values = []
 
-    list_alpha = []
-    list_beta = []
+    for filename in os.listdir(filepath):
 
-    X = doc['Stock return'].values
-    y = doc['Market return'].values
+        doc = read_csv(filepath+'/'+filename)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-    regressor = LinearRegression()
-    regressor.fit(X_train, y_train)
+        X = doc['Stock return'].iloc[1:]
+        Y = doc['Market return'].iloc[1:]
 
-    # prediction
-    y_pred = regressor.predict(X_test)
-    df_prediction = DataFrame({'Actual': y_test, 'Predicted': y_pred})
+        # Add a constant to the independent value
+        X1 = sm.add_constant(X)
 
-    alpha = regressor.intercept_
-    beta = regressor.coef_[0]
+        # make regression model
+        model = sm.OLS(Y, X1)
 
-    list_alpha.append(alpha)
-    list_beta.append(beta)
+        # fit model and print results
+        results = model.fit()
 
-    size_diff = len(X) - len(y_pred)
-    padding_list = []
-    for i in range(size_diff):
-        padding_list.append(None)
-    y_pred = np.append(y_pred, np.asarray(padding_list))
+        slope, intercept, r_value, p_value, std_err = stats.linregress(X, Y)
 
-    XYdf = pd.DataFrame()
-    XYdf.insert(0, 'X', value=list(flatten(X)))
-    XYdf.insert(1, 'Y', value=y_pred)
+        # beta and alpha values
+        alpha_values.append(intercept)
+        beta_values.append(slope)
 
-    '''
-    sns.regplot(x='X', y='Y', data=XYdf)
-    plt.title('Y_pred against X values')
-    plt.show()
-    '''
+    analysis_val = pd.DataFrame(alpha_values, columns=['Alpha'])
+    analysis_val['Beta'] = beta_values
 
-    ABdf = pd.DataFrame()
-    ABdf.insert(0, 'Alpha', value=list_alpha)
-    ABdf.insert(1, 'Beta', value=list_beta)
-
-    sns.regplot(x="Alpha", y="Beta", data=ABdf)
-    plt.title('Alpha against Beta values')
-    plt.show()
-
-    print("Alpha values: ", list_alpha, "\n Beta values: ", list_beta)
-
+    path = filepath.partition('/')
+    path_complete = Path(path[0] + '/' + path[2] + '/Alpha-Beta-Values.csv')
+    analysis_val.to_csv(path_complete)
 
 def CAAR(filepath):
     # sum-from1toN(stock_return - beta * market_return - alpha)/N
@@ -256,4 +233,4 @@ def CAAR(filepath):
 
 # compute the CAPM and extract alpha and beta values
 # example with one file
-capm("Data/DAX/Prices/1COV.DE-Moody's-2018-07-30/1COV.DE-Moody's-2017-07-30-2018-07-30.csv")
+capm("Data/DAX/Prices/1COV.DE-Moody's-2018-07-30")
