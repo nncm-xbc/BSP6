@@ -20,19 +20,19 @@ def capm(filepath):
 
         doc = read_csv(filepath+'/'+filename)
 
-        X = doc['Stock return'].iloc[1:]
-        Y = doc['Market return'].iloc[1:]
+        x = doc['Stock return'].iloc[1:]
+        y = doc['Market return'].iloc[1:]
 
         # Add a constant to the independent value
-        X1 = sm.add_constant(X)
+        x1 = sm.add_constant(x)
 
         # make regression model
-        model = sm.OLS(Y, X1)
+        model = sm.OLS(y, x1)
 
         # fit model and print results
-        results = model.fit()
+        # results = model.fit()
 
-        slope, intercept, r_value, p_value, std_err = stats.linregress(X, Y)
+        slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
 
         # beta and alpha values
         alpha_values.append(intercept)

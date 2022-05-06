@@ -1,5 +1,4 @@
 # Simon Hugot
-import os
 import pandas as pd
 from pandas import *
 from pathlib import Path
@@ -10,7 +9,8 @@ def detect_event(raw_data, market):
     Function that takes as input a raw csv file containing the event-log of security ratings
     for both the S&P and Moody's rating agencies.
     This function can only handle S&P and Moody's ratings as the grading scales are hardcoded.
-    :param raw_data: name of the csv file containing the event-log of the security ratings for S&P and Moody's on a specified market
+    :param raw_data: name of the csv file containing the event-log of the security ratings
+    for S&P and Moody's on a specified market
     :param market: name of the market for which the security ratings are defined.
     :return: returns a csv that only contains the stocks for which the security ratings has been updated.
     The date of the change is specified, as well as whether it has been upgraded of downgraded.
@@ -20,8 +20,10 @@ def detect_event(raw_data, market):
     r, c = doc.shape
 
     # first S&P second Moody's
-    rating_scales = [["AAA", "AA+", "AA", "AA-", "A+", "A", "A-", "BBB+", "BBB", "BBB-", "BB+", "BB", "BB-", "B+", "B", "B-", "CCC+", "CCC", "CCC-", "CC", "C", "D"],
-                     ["Aaa", "Aa1", "Aa2", "Aa3", "A1", "A2", "A3", "Baa1", "Baa2", "Baa3", "Ba1", "Ba2", "Ba3", "B1", "B2", "B3", "Caa1", "Caa2", "Caa3", "Caa"]]
+    rating_scales = [["AAA", "AA+", "AA", "AA-", "A+", "A", "A-", "BBB+", "BBB", "BBB-", "BB+", "BB", "BB-", "B+", "B",
+                      "B-", "CCC+", "CCC", "CCC-", "CC", "C", "D"],
+                     ["Aaa", "Aa1", "Aa2", "Aa3", "A1", "A2", "A3", "Baa1", "Baa2", "Baa3", "Ba1", "Ba2", "Ba3", "B1",
+                      "B2", "B3", "Caa1", "Caa2", "Caa3", "Caa"]]
 
     names_agencies = ["S&P", "Moody's"]
     names_dates = ["DateS", "DateM"]
@@ -53,7 +55,8 @@ def detect_event(raw_data, market):
 
         for tupl in variation_list:
             for tups in variation_list:
-                if tupl[0] == tups[0] and tupl[1] != tups[1] and variation_list.index(tupl) < variation_list.index(tups):
+                if tupl[0] == tups[0] and tupl[1] != tups[1] \
+                        and variation_list.index(tupl) < variation_list.index(tups):
                     # some ratings have a 'range' with either '/' or '-' as a seperator
                     # we will only take into account the lowest rating of the range
                     if ' / ' in tupl[2] or ' / ' in tups[2]:
@@ -79,7 +82,8 @@ def detect_event(raw_data, market):
                         # if the comparison cannot be made the change is simply non-available
                         # ie: first rating change of the dataset
                         final_list.append((tupl[0], tupl[1], "N/A"))
-                elif tupl[0] == tups[0] and tupl[1] != tups[1] and variation_list.index(tupl) > variation_list.index(tups):
+                elif tupl[0] == tups[0] and tupl[1] != tups[1] \
+                        and variation_list.index(tupl) > variation_list.index(tups):
                     final_list.append((tupl[0], tupl[1], "N/A"))
                 else:
                     continue

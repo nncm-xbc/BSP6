@@ -1,6 +1,8 @@
 # Simon Hugot
 import os
+import pandas as pd
 from pandas import *
+
 
 def caar(filepath):
     alphabetavalues = read_csv(filepath + '/Alpha-Beta-Values.csv')
@@ -9,6 +11,7 @@ def caar(filepath):
     counter = 0
 
     final_values = []
+    final_df = pd.DataFrame()
 
     for filename in os.listdir(filepath):
         if filename_part[3][:9] in filename:
@@ -25,13 +28,18 @@ def caar(filepath):
             counter += 1
 
             # number of observations (days)
-            N = 365
-            for i in range(1, N+1):
+            n = 365
+            for i in range(1, n+1):
                 abv += (stock_return - beta * market_return - alpha)
 
-            abv = abv/N
+            abv = abv/n
             final_values.append(abv)
+            # col_name = 'Values' + str(counter)
+            # final_df[col_name] = final_values
         else:
             continue
-
     print(final_values)
+    '''
+    path = filepath + 'cumulative-averaging-abnormal-returns.csv'
+    final_df.to_csv(path)
+    '''
