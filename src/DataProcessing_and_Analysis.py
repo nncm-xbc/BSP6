@@ -1,7 +1,7 @@
 # Simon Hugot
 from Event_detection import detect_event
 from Daily_returns import daily_return_index
-from CAAR import caar
+from CAAR import car
 from CAPM import capm
 
 # Main script
@@ -17,4 +17,4 @@ from CAPM import capm
 #    capm("Data/DAX/Prices/" + directory)
 
 # compute the CAAR
-caar("Data/DAX/Prices/1COV.DE-Moody's-2018-07-30")
+car("Data/DAX/Prices/1COV.DE-Moody's-2018-07-30")
