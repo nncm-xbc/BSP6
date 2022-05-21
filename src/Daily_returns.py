@@ -28,8 +28,11 @@ def daily_return_index(filepath):
 
         # compute the three 1 year periods
         dtObj = datetime.strptime(date, '%Y-%m-%d')
-        start_dates = [ dtObj - relativedelta(years=1), dtObj - relativedelta(months=6), dtObj]
-        end_dates = [dtObj, dtObj + relativedelta(months=6), dtObj + relativedelta(years=1)]
+        civ_year_strt = datetime.strptime(date[0:4] + "-01-01", '%Y-%m-%d')
+        civ_year_end = datetime.strptime(date[0:4] + '-01-01', '%Y-%m-%d') + relativedelta(years=1)
+
+        start_dates = [ dtObj - relativedelta(years=1), dtObj - relativedelta(months=6), dtObj, civ_year_strt]
+        end_dates = [dtObj, dtObj + relativedelta(months=6), dtObj + relativedelta(years=1), civ_year_end]
 
         # compute the whole thing for every period (here x3)
         for iter in range(len(start_dates)):
@@ -68,7 +71,6 @@ def daily_return_index(filepath):
             start_datestr = start_dates[iter].strftime('%Y-%m-%d')
             end_datestr = end_dates[iter].strftime('%Y-%m-%d')
             end_datestr0 = end_dates[0].strftime('%Y-%m-%d')
-            print(end_datestr0)
             temp_path = 'Data/' + market_name + '/Prices/' + stock_name + '-' + agency_name + '-' + end_datestr0
             if os.path.isdir(temp_path):
                 filepath = Path(temp_path + '/' + stock_name + '-' + agency_name + '-' + start_datestr + '-' + end_datestr + '.csv')

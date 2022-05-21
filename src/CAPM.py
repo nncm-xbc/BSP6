@@ -15,28 +15,37 @@ def capm(filepath):
     """
     alpha_values = []
     beta_values = []
+    counter = 0
 
     for filename in os.listdir(filepath):
+        if "Moody's" in filename or "S&P" in filename:
+            if counter < 1:
+                print(filename)
+                doc = read_csv(filepath+'/'+filename)
+                x = doc['Stock return'].iloc[1:]
+                y = doc['Market return'].iloc[1:]
 
-        doc = read_csv(filepath+'/'+filename)
+                # Add a constant to the independent value
+                x1 = sm.add_constant(x)
 
-        x = doc['Stock return'].iloc[1:]
-        y = doc['Market return'].iloc[1:]
+                # make regression model
+                model = sm.OLS(y, x1)
 
-        # Add a constant to the independent value
-        x1 = sm.add_constant(x)
+                # fit model and print results
+                # results = model.fit()
 
-        # make regression model
-        model = sm.OLS(y, x1)
+                slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
 
-        # fit model and print results
-        # results = model.fit()
+                # beta and alpha values
+                alpha_values.append(intercept)
+                beta_values.append(slope)
+                counter + 1
+            else:
+                break
+        else:
+            continue
 
-        slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
 
-        # beta and alpha values
-        alpha_values.append(intercept)
-        beta_values.append(slope)
 
     analysis_val = pd.DataFrame(alpha_values, columns=['Alpha'])
     analysis_val['Beta'] = beta_values

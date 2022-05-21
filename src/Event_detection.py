@@ -38,6 +38,8 @@ def detect_event(raw_data, market):
 
             # create 3 lists for each comopany: ratings, dates, prices (makes it easier to compare the indexes)
             for row in range(1, r):
+                print(names_agencies[index_agency])
+                print(doc.iloc[row, 0])
                 if names_agencies[index_agency] in doc.iloc[row, 0]:
                     ratings_list.append(doc.iloc[row, col])
                 elif names_dates[index_agency] in doc.iloc[row, 0]:
