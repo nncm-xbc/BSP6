@@ -20,7 +20,6 @@ def capm(filepath):
     for filename in os.listdir(filepath):
         if "Moody's" in filename or "S&P" in filename:
             if counter < 1:
-                print(filename)
                 doc = read_csv(filepath+'/'+filename)
                 x = doc['Stock return'].iloc[1:]
                 y = doc['Market return'].iloc[1:]
