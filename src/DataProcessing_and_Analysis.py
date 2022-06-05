@@ -40,20 +40,15 @@ for filepath in os.listdir("Data/DAX/Prices"):
     path = "Data/DAX/Prices/" + filepath
     car(path)
 print("CAR completed")
-"""
+
 # One sample T Test
-for directory in os.listdir("Data/DAX/Prices/"):
-    path = "Data/DAX/Prices/" + directory + "/Abnormal_returns.csv"
+for directory in os.listdir("C:/Users/Leshu/PycharmProjects/BSP6/Data/DAX/Prices"):
+    path = "C:/Users/Leshu/PycharmProjects/BSP6/Data/DAX/Prices/" + directory
     one_sample_t_test(path)
 print("One sample T test completed")
-
+"""
 # Two sample T Test
-for directory in os.listdir("Data/DAX/Prices/"):
-    path = "Data/DAX/Prices/" + directory + "/Abnormal_returns.csv"
-    two_sample_t_test(path)
-print("Two sample T test completed")
-
-
+two_sample_t_test("C:/Users/Leshu/PycharmProjects/BSP6/Data/DAX/Prices")
 
 """
 # ------------ FTSE ------------
@@ -85,10 +80,9 @@ for filepath in os.listdir("Data/^FTSE/Prices"):
 
 # One sample T Test
 one_sample_t_test("Data/DAX/Prices/1COV.DE-Moody's-2018-07-30/Abnormal_returns.csv")
-
-# Two sample T Test
-two_sample_t_test("Data/DAX/Prices/1COV.DE-Moody's-2018-07-30/Abnormal_returns.csv")
 """
+# Two sample T Test
+two_sample_t_test("C:/Users/Leshu/PycharmProjects/BSP6/Data/^FTSE/Prices")
 
 """
 # ------------ NIKKEI ------------
@@ -119,7 +113,6 @@ for filepath in os.listdir("Data/^N225/Prices"):
 
 # One sample T Test
 one_sample_t_test("Data/DAX/Prices/1COV.DE-Moody's-2018-07-30/Abnormal_returns.csv")
-
-# Two sample T Test
-two_sample_t_test("Data/DAX/Prices/1COV.DE-Moody's-2018-07-30/Abnormal_returns.csv")
 """
+# Two sample T Test
+two_sample_t_test("C:/Users/Leshu/PycharmProjects/BSP6/Data/^N225/Prices")
