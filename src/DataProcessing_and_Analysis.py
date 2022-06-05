@@ -9,12 +9,12 @@ from Ttest import one_sample_t_test, two_sample_t_test
 import os
 
 # Main script
-"""
+
 # ------------ DAX ------------
 # get list of stock for which changes were made in their security ratings#
 # detect_event('rating_dax.csv', 'DAX')
 
-
+"""
 # download the daily prices for the market and the stocks of the previous list.
 daily_return_index("Data/DAX/StockChanges-DAX-Moody's.csv")
 print("Daily return completed")
@@ -50,6 +50,19 @@ print("One sample T test completed")
 # Two sample T Test
 two_sample_t_test("C:/Users/Leshu/PycharmProjects/BSP6/Data/DAX/Prices")
 """
+two_sample_results = csv_read("C:\Users\Leshu\PycharmProjects\BSP6\Data\DAX\Two_sample_results.csv")
+StockChanges = csv_read("C:\Users\Leshu\PycharmProjects\BSP6\Data\DAX\StockChanges-DAX-Moody's.csv")
+
+for entry in two_sample_results:
+    variation_list = []
+    NameList = entry[1].split('-')
+    for variation_entry in StockChanges:
+        if NameList[1] == variation_list[2] and NameList[1] == variation_entry[3] and NameList[2] == variation_entry[4]:
+            variation_list.append(variation_entry[5])
+            print(variation_list)
+        else:
+            continue
+
 """
 # ------------ FTSE ------------
 # get list of stock for which changes were made in their security ratings#
@@ -72,19 +85,18 @@ for directory in os.listdir('Data/^FTSE/Prices'):
 for directory in os.listdir('Data/^FTSE/Prices'):
     path = "Data/^FTSE/Prices/" + directory
     capm(path)
-"""
+
 # compute the CAAR
 for filepath in os.listdir("C:/Users/Leshu/PycharmProjects/BSP6/Data/^FTSE/Prices"):
     path = "C:/Users/Leshu/PycharmProjects/BSP6/Data/^FTSE/Prices/" + filepath
     car(path)
-"""
+
 # One sample T Test
 one_sample_t_test("Data/DAX/Prices/1COV.DE-Moody's-2018-07-30/Abnormal_returns.csv")
-"""
-# Two sample T Test
-# two_sample_t_test("C:/Users/Leshu/PycharmProjects/BSP6/Data/^FTSE/Prices")
 
-"""
+# Two sample T Test
+two_sample_t_test("C:/Users/Leshu/PycharmProjects/BSP6/Data/^FTSE/Prices")
+
 # ------------ NIKKEI ------------
 # get list of stock for which changes were made in their security ratings#
 # detect_event('rating_nikkei.csv', '^N225')
@@ -107,12 +119,13 @@ for directory in os.listdir('Data/^N225/Prices'):
     capm(path)
 
 # compute the CAAR
-for filepath in os.listdir("Data/^N225/Prices"):
-    path = "Data/^N225/Prices/" + filepath
+for filepath in os.listdir("C:/Users/Leshu/PycharmProjects/BSP6/Data/^N225/Prices"):
+    path = "C:/Users/Leshu/PycharmProjects/BSP6/Data/^N225/Prices/" + filepath
     car(path)
 
 # One sample T Test
 one_sample_t_test("Data/DAX/Prices/1COV.DE-Moody's-2018-07-30/Abnormal_returns.csv")
-"""
+
 # Two sample T Test
-# two_sample_t_test("C:/Users/Leshu/PycharmProjects/BSP6/Data/^N225/Prices")
+two_sample_t_test("C:/Users/Leshu/PycharmProjects/BSP6/Data/^N225/Prices")
+"""

@@ -13,7 +13,7 @@ def car(filepath):
     final_df = pd.DataFrame()
 
     for filename in os.listdir(filepath):
-        if filepath_part[3][:9] in filename:
+        if filepath_part[8][:9] in filename:
             doc = read_csv(filepath + '/' + filename)
 
             # daily returns
@@ -29,8 +29,8 @@ def car(filepath):
             abv = abv.tolist()
 
             final_values.append(abv)
-            print(filename)
-            col_name = filename.split('.')[1][22:]
+            col_name = filename.split('.')[1][21:]
+            print(col_name)
             final_df[col_name] = pd.Series(final_values[counter])
             final_df.to_csv(filepath + '/Abnormal_returns.csv')
             counter += 1
