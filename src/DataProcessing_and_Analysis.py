@@ -46,10 +46,10 @@ for directory in os.listdir("C:/Users/Leshu/PycharmProjects/BSP6/Data/DAX/Prices
     path = "C:/Users/Leshu/PycharmProjects/BSP6/Data/DAX/Prices/" + directory
     one_sample_t_test(path)
 print("One sample T test completed")
-"""
+
 # Two sample T Test
 two_sample_t_test("C:/Users/Leshu/PycharmProjects/BSP6/Data/DAX/Prices")
-
+"""
 """
 # ------------ FTSE ------------
 # get list of stock for which changes were made in their security ratings#
@@ -74,8 +74,8 @@ for directory in os.listdir('Data/^FTSE/Prices'):
     capm(path)
 """
 # compute the CAAR
-for filepath in os.listdir("Data/^FTSE/Prices"):
-    path = "Data/^FTSE/Prices/" + filepath
+for filepath in os.listdir("C:/Users/Leshu/PycharmProjects/BSP6/Data/^FTSE/Prices"):
+    path = "C:/Users/Leshu/PycharmProjects/BSP6/Data/^FTSE/Prices/" + filepath
     car(path)
 """
 # One sample T Test
