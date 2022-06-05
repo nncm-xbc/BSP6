@@ -72,17 +72,17 @@ for directory in os.listdir('Data/^FTSE/Prices'):
 for directory in os.listdir('Data/^FTSE/Prices'):
     path = "Data/^FTSE/Prices/" + directory
     capm(path)
-
+"""
 # compute the CAAR
 for filepath in os.listdir("Data/^FTSE/Prices"):
     path = "Data/^FTSE/Prices/" + filepath
     car(path)
-
+"""
 # One sample T Test
 one_sample_t_test("Data/DAX/Prices/1COV.DE-Moody's-2018-07-30/Abnormal_returns.csv")
 """
 # Two sample T Test
-two_sample_t_test("C:/Users/Leshu/PycharmProjects/BSP6/Data/^FTSE/Prices")
+# two_sample_t_test("C:/Users/Leshu/PycharmProjects/BSP6/Data/^FTSE/Prices")
 
 """
 # ------------ NIKKEI ------------
@@ -115,4 +115,4 @@ for filepath in os.listdir("Data/^N225/Prices"):
 one_sample_t_test("Data/DAX/Prices/1COV.DE-Moody's-2018-07-30/Abnormal_returns.csv")
 """
 # Two sample T Test
-two_sample_t_test("C:/Users/Leshu/PycharmProjects/BSP6/Data/^N225/Prices")
+# two_sample_t_test("C:/Users/Leshu/PycharmProjects/BSP6/Data/^N225/Prices")

@@ -29,7 +29,7 @@ def car(filepath):
             abv = abv.tolist()
 
             final_values.append(abv)
-
+            print(filename)
             col_name = filename.split('.')[1][22:]
             final_df[col_name] = pd.Series(final_values[counter])
             final_df.to_csv(filepath + '/Abnormal_returns.csv')
