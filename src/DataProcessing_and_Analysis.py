@@ -7,6 +7,7 @@ from CAAR import car
 from CAPM import capm
 from Ttest import one_sample_t_test, two_sample_t_test
 import os
+from pandas import *
 
 # Main script
 
@@ -50,19 +51,22 @@ print("One sample T test completed")
 # Two sample T Test
 two_sample_t_test("C:/Users/Leshu/PycharmProjects/BSP6/Data/DAX/Prices")
 """
-two_sample_results = csv_read("C:\Users\Leshu\PycharmProjects\BSP6\Data\DAX\Two_sample_results.csv")
-StockChanges = csv_read("C:\Users\Leshu\PycharmProjects\BSP6\Data\DAX\StockChanges-DAX-Moody's.csv")
+two_sample_results = read_csv("C:/Users/Leshu/PycharmProjects/BSP6/Data/DAX/Two_sample_results.csv")
+StockChanges = read_csv("C:/Users/Leshu/PycharmProjects/BSP6/Data/DAX/StockChanges-DAX-Moody's.csv")
 
-for entry in two_sample_results:
-    variation_list = []
-    NameList = entry[1].split('-')
-    for variation_entry in StockChanges:
-        if NameList[1] == variation_list[2] and NameList[1] == variation_entry[3] and NameList[2] == variation_entry[4]:
-            variation_list.append(variation_entry[5])
-            print(variation_list)
+variation_list = []
+for i in range(len(two_sample_results)):
+    NameList = two_sample_results.iloc[i].tolist()[1].split('-')
+    for j in range(len(StockChanges)):
+        if NameList[1] == StockChanges.iloc[j].tolist()[2] and NameList[0] == StockChanges.iloc[j].tolist()[3] and str(NameList[2])+'-'+str(NameList[3])+'-'+str(NameList[4]) == StockChanges.iloc[j].tolist()[4]:
+            variation_list.append(StockChanges.iloc[j].tolist()[5])
+            print(two_sample_results.iloc[i].tolist()[1])
+            print(StockChanges.iloc[j].tolist()[5])
         else:
             continue
 
+two_sample_results['Variations'] = variation_list
+two_sample_results.to_csv("C:/Users/Leshu/PycharmProjects/BSP6/Data/DAX/Two_sample_results.csv")
 """
 # ------------ FTSE ------------
 # get list of stock for which changes were made in their security ratings#
