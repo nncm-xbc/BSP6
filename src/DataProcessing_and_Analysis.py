@@ -15,7 +15,7 @@ from pandas import *
 # get list of stock for which changes were made in their security ratings#
 # detect_event('rating_dax.csv', 'DAX')
 
-"""
+
 # download the daily prices for the market and the stocks of the previous list.
 daily_return_index("Data/DAX/StockChanges-DAX-Moody's.csv")
 print("Daily return completed")
@@ -50,7 +50,7 @@ print("One sample T test completed")
 
 # Two sample T Test
 two_sample_t_test("C:/Users/Leshu/PycharmProjects/BSP6/Data/DAX/Prices")
-"""
+
 two_sample_results = read_csv("C:/Users/Leshu/PycharmProjects/BSP6/Data/DAX/Two_sample_results.csv")
 StockChanges = read_csv("C:/Users/Leshu/PycharmProjects/BSP6/Data/DAX/StockChanges-DAX-Moody's.csv")
 
@@ -60,14 +60,12 @@ for i in range(len(two_sample_results)):
     for j in range(len(StockChanges)):
         if NameList[1] == StockChanges.iloc[j].tolist()[2] and NameList[0] == StockChanges.iloc[j].tolist()[3] and str(NameList[2])+'-'+str(NameList[3])+'-'+str(NameList[4]) == StockChanges.iloc[j].tolist()[4]:
             variation_list.append(StockChanges.iloc[j].tolist()[5])
-            print(two_sample_results.iloc[i].tolist()[1])
-            print(StockChanges.iloc[j].tolist()[5])
         else:
             continue
 
 two_sample_results['Variations'] = variation_list
 two_sample_results.to_csv("C:/Users/Leshu/PycharmProjects/BSP6/Data/DAX/Two_sample_results.csv")
-"""
+
 # ------------ FTSE ------------
 # get list of stock for which changes were made in their security ratings#
 # detect_event('rating_ftse.csv', '^FTSE')
@@ -101,6 +99,20 @@ one_sample_t_test("Data/DAX/Prices/1COV.DE-Moody's-2018-07-30/Abnormal_returns.c
 # Two sample T Test
 two_sample_t_test("C:/Users/Leshu/PycharmProjects/BSP6/Data/^FTSE/Prices")
 
+two_sample_results = read_csv("C:/Users/Leshu/PycharmProjects/BSP6/Data/^FTSE/Two_sample_results.csv")
+StockChanges = read_csv("C:/Users/Leshu/PycharmProjects/BSP6/Data/^FTSE/StockChanges-^FTSE-Moody's.csv")
+
+variation_list = []
+for i in range(len(two_sample_results)):
+    NameList = two_sample_results.iloc[i].tolist()[1].split('-')
+    for j in range(len(StockChanges)):
+        if NameList[1] == StockChanges.iloc[j].tolist()[2] and NameList[0] == StockChanges.iloc[j].tolist()[3] and str(NameList[2])+'-'+str(NameList[3])+'-'+str(NameList[4]) == StockChanges.iloc[j].tolist()[4]:
+            variation_list.append(StockChanges.iloc[j].tolist()[5])
+        else:
+            continue
+two_sample_results['Variations'] = variation_list
+two_sample_results.to_csv("C:/Users/Leshu/PycharmProjects/BSP6/Data/^FTSE/Two_sample_results.csv")
+
 # ------------ NIKKEI ------------
 # get list of stock for which changes were made in their security ratings#
 # detect_event('rating_nikkei.csv', '^N225')
@@ -132,4 +144,18 @@ one_sample_t_test("Data/DAX/Prices/1COV.DE-Moody's-2018-07-30/Abnormal_returns.c
 
 # Two sample T Test
 two_sample_t_test("C:/Users/Leshu/PycharmProjects/BSP6/Data/^N225/Prices")
-"""
+
+two_sample_results = read_csv("C:/Users/Leshu/PycharmProjects/BSP6/Data/^N225/Two_sample_results.csv")
+StockChanges = read_csv("C:/Users/Leshu/PycharmProjects/BSP6/Data/^N225/StockChanges-^N225-Moody's.csv")
+
+variation_list = []
+for i in range(len(two_sample_results)):
+    NameList = two_sample_results.iloc[i].tolist()[1].split('-')
+    for j in range(len(StockChanges)):
+        if NameList[1] == StockChanges.iloc[j].tolist()[2] and NameList[0] == StockChanges.iloc[j].tolist()[3] and str(NameList[2])+'-'+str(NameList[3])+'-'+str(NameList[4]) == StockChanges.iloc[j].tolist()[4]:
+            variation_list.append(StockChanges.iloc[j].tolist()[5])
+        else:
+            continue
+
+two_sample_results['Variations'] = variation_list
+two_sample_results.to_csv("C:/Users/Leshu/PycharmProjects/BSP6/Data/^N225/Two_sample_results.csv")

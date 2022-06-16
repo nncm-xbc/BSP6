@@ -2,7 +2,6 @@
 0,^N225,Moody's,3382.T,2021-01-25,Decreased
 2,^N225,Moody's,3382.T,2018-09-12,N/A
 4,^N225,Moody's,4502.T,2018-12-17,Decreased
-6,^N225,Moody's,4502.T,2018-05-09,N/A
 7,^N225,Moody's,4502.T,2018-05-09,Decreased
 8,^N225,Moody's,4502.T,2017-02-27,N/A
 10,^N225,Moody's,5401.T,2020-02-26,Decreased
@@ -10,11 +9,9 @@
 12,^N225,Moody's,6752.T,2020-02-10,Decreased
 13,^N225,Moody's,6752.T,2016-10-25,N/A
 14,^N225,Moody's,6758.T,2020-12-04,Increased
-16,^N225,Moody's,6758.T,2018-03-22,N/A
 17,^N225,Moody's,6758.T,2018-03-22,Increased
 18,^N225,Moody's,6758.T,2016-12-13,N/A
 20,^N225,Moody's,7201.T,2020-06-16,Decreased
-22,^N225,Moody's,7201.T,2019-05-24,N/A
 23,^N225,Moody's,7201.T,2019-05-24,Decreased
 24,^N225,Moody's,7201.T,2017-01-26,N/A
 26,^N225,Moody's,9101.T,2020-07-21,Increased
